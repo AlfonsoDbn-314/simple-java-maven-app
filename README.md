@@ -1,4 +1,4 @@
-# simple-java-maven-app 2026 4PM
+# simple-java-maven-app 2026
 
 Version 1.1
 
