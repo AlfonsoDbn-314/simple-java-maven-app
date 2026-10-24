@@ -11,8 +11,8 @@ services:
       JENKINS_ADMIN_USER: ${JENKINS_ADMIN_USER:-admin}
       JENKINS_ADMIN_PASSWORD: ${JENKINS_ADMIN_PASSWORD:-admin}
       JENKINS_PUBLIC_URL: ${JENKINS_PUBLIC_URL:-http://localhost:8080/}
-      SONAR_TOKEN: ${SONAR_TOKEN:-}
-      SLACK_TOKEN: ${SLACK_TOKEN:-}
+      SONAR_TOKEN: ${SONAR_TOKEN:-sin-token}
+      SLACK_TOKEN: ${SLACK_TOKEN:-sin-token}
       SLACK_WORKSPACE: ${SLACK_WORKSPACE:-}
       SLACK_CHANNEL: ${SLACK_CHANNEL:-#jenkins}
       REPO_URL: ${REPO_URL:-https://github.com/AlfonsoDbn-314/simple-java-maven-app.git}
