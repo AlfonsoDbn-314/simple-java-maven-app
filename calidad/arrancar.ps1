@@ -19,9 +19,15 @@ wsl -d docker-desktop sysctl -w vm.max_map_count=262144 | Out-Null
 
 Write-Host "1/4 Levantando PostgreSQL y SonarQube"
 docker compose up -d db sonarqube
+$intentos = 0
 do {
     Start-Sleep 5
+    $intentos++
     try { $estado = (Invoke-RestMethod "$sonar/api/system/status").status } catch { $estado = "" }
+    if ((docker inspect -f '{{.State.Running}}' sonarqube) -ne "true") {
+        throw "SonarQube se detuvo. Revisa: docker logs sonarqube --tail 50"
+    }
+    if ($intentos -ge 60) { throw "SonarQube no arrancó en 5 minutos" }
 } until ($estado -eq "UP")
 
 Write-Host "2/4 Generando token de SonarQube"

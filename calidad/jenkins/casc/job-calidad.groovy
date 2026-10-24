@@ -1,6 +1,8 @@
 // Job freestyle de la guía, creado con Job DSL. Mismo orden de pasos que harías a mano.
-job('calidad-simple-java-maven-app') {
-    description('Compila, prueba, analiza con SonarQube y notifica a Slack')
+// El nombre sigue el formato del laboratorio: <carné>_JavaMaven1A.
+job(System.getenv('JOB_NAME_LAB') ?: '0900216641_JavaMaven1A') {
+    description('Proyecto Java con Maven para Integración Continua')
+    jdk('jdk21')
     scm {
         git {
             remote {
@@ -14,18 +16,18 @@ job('calidad-simple-java-maven-app') {
     }
     steps {
         maven {
-            mavenInstallation('mavenjenkins')
+            mavenInstallation('maven2026A')
             goals('-B clean package -DskipTests')
         }
         maven {
-            mavenInstallation('mavenjenkins')
+            mavenInstallation('maven2026A')
             goals('-B test')
         }
         sonarRunnerBuilder {
             installationName('sonarqube')
             sonarScannerName('sonar-scanner')
-            properties('''sonar.projectKey=simple-java-maven-app
-sonar.projectName=simple-java-maven-app
+            properties('''sonar.projectKey=0900216641_JavaMaven1A
+sonar.projectName=0900216641_JavaMaven1A
 sonar.sources=src/main/java
 sonar.java.binaries=target/classes
 sonar.tests=src/test/java
@@ -47,7 +49,7 @@ sonar.sourceEncoding=UTF-8''')
             notifyNotBuilt(false)
             notifyUnstable(false)
             notifyRepeatedFailure(false)
-            includeTestSummary(true)
+            includeTestSummary(false)
             includeCustomMessage(false)
             commitInfoChoice('AUTHORS_AND_TITLES')
         }

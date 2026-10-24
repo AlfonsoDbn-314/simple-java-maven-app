@@ -17,6 +17,7 @@ services:
       SLACK_CHANNEL: ${SLACK_CHANNEL:-#jenkins}
       REPO_URL: ${REPO_URL:-https://github.com/AlfonsoDbn-314/simple-java-maven-app.git}
       REPO_BRANCH: ${REPO_BRANCH:-*/master}
+      JOB_NAME_LAB: ${JOB_NAME_LAB:-0900216641_JavaMaven1A}
     volumes:
       - jenkins_home:/var/jenkins_home
     depends_on:

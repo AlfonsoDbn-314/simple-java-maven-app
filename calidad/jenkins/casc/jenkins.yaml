@@ -29,9 +29,13 @@ credentials:
               secret: "${SLACK_TOKEN:-sin-token}"
 
 tool:
+  jdk:
+    installations:
+      - name: "jdk21"
+        home: "/opt/java/openjdk"
   maven:
     installations:
-      - name: "mavenjenkins"
+      - name: "maven2026A"
         home: "/opt/maven"
   sonarRunnerInstallation:
     installations:
