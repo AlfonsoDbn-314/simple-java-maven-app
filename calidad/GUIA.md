@@ -59,7 +59,7 @@ La primera vez tarda unos minutos porque construye la imagen de Jenkins con sus 
 Para entrar a Jenkins por primera vez necesitas la contraseña inicial, que se genera dentro del contenedor:
 
 ```
-docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+docker exec calidad-jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 ```
 
 Elige "Instalar plugins sugeridos" y crea tu usuario administrador. En SonarQube entra con admin y admin; te pedirá cambiar la contraseña.

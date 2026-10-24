@@ -17,8 +17,8 @@ echo "1/4 Levantando PostgreSQL y SonarQube"
 docker compose up -d db sonarqube
 for i in $(seq 1 60); do
   curl -fs "$SONAR/api/system/status" | grep -q '"status":"UP"' && break
-  if [ "$(docker inspect -f '{{.State.Running}}' sonarqube)" != "true" ]; then
-    echo "SonarQube se detuvo. Revisa: docker logs sonarqube --tail 50"; exit 1
+  if [ "$(docker inspect -f '{{.State.Running}}' calidad-sonarqube)" != "true" ]; then
+    echo "SonarQube se detuvo. Revisa: docker logs calidad-sonarqube --tail 50"; exit 1
   fi
   [ "$i" = 60 ] && { echo "SonarQube no arrancó en 5 minutos"; exit 1; }
   sleep 5

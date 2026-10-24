@@ -24,8 +24,8 @@ do {
     Start-Sleep 5
     $intentos++
     try { $estado = (Invoke-RestMethod "$sonar/api/system/status").status } catch { $estado = "" }
-    if ((docker inspect -f '{{.State.Running}}' sonarqube) -ne "true") {
-        throw "SonarQube se detuvo. Revisa: docker logs sonarqube --tail 50"
+    if ((docker inspect -f '{{.State.Running}}' calidad-sonarqube) -ne "true") {
+        throw "SonarQube se detuvo. Revisa: docker logs calidad-sonarqube --tail 50"
     }
     if ($intentos -ge 60) { throw "SonarQube no arrancó en 5 minutos" }
 } until ($estado -eq "UP")
