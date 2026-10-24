@@ -56,13 +56,7 @@ docker compose up -d --build
 
 La primera vez tarda unos minutos porque construye la imagen de Jenkins con sus plugins. Cuando termine tendrás Jenkins en http://localhost:8080, SonarQube en http://localhost:9000 y el panel de ngrok en http://localhost:4040. Ese panel muestra la URL pública que ngrok le asignó a tu Jenkins, algo como `https://xxxx.ngrok-free.app`, y también cada petición que entra, lo que sirve mucho para comprobar si GitHub está llegando.
 
-Para entrar a Jenkins por primera vez necesitas la contraseña inicial, que se genera dentro del contenedor:
-
-```
-docker exec calidad-jenkins cat /var/jenkins_home/secrets/initialAdminPassword
-```
-
-Elige "Instalar plugins sugeridos" y crea tu usuario administrador. En SonarQube entra con admin y admin; te pedirá cambiar la contraseña.
+Jenkins arranca sin asistente inicial porque ya viene configurado. Entra con el usuario y la contraseña que definiste en `JENKINS_ADMIN_USER` y `JENKINS_ADMIN_PASSWORD`, o con admin y admin si no definiste ninguno. En SonarQube entra con admin y admin; te pedirá cambiar la contraseña.
 
 Un detalle importante: dentro de la red de Docker, Jenkins no ve a SonarQube como `localhost`, porque `localhost` dentro de un contenedor es el propio contenedor. Lo ve por el nombre del servicio, es decir `http://sonarqube:9000`. Tú desde el navegador sí usas `localhost:9000`.
 
