@@ -2,6 +2,26 @@
 
 Este paquete levanta un entorno de aseguramiento de calidad en tu máquina y lo conecta con tu repositorio `AlfonsoDbn-314/simple-java-maven-app`. Cada push a GitHub llega a Jenkins a través de ngrok, Jenkins descarga el código, Maven lo compila y ejecuta las pruebas, SonarQube revisa la calidad del código y Slack te avisa del resultado.
 
+## Arranque rápido
+
+Si quieres saltarte la configuración manual, la carpeta `calidad` de tu repositorio trae Jenkins configurado como código. Al arrancar ya existen tu usuario, el JDK `jdk21`, Maven `maven2026A`, el scanner `sonar-scanner`, el servidor `sonarqube`, las credenciales y el job `0900216641_JavaMaven1A` con los tres pasos y las dos acciones. Primero fusiona el PR, luego, con Docker Desktop abierto, ejecuta en PowerShell:
+
+```
+git clone https://github.com/AlfonsoDbn-314/simple-java-maven-app.git
+cd simple-java-maven-app\calidad
+$env:SONAR_ADMIN_PASSWORD = "UnaClaveSegura#2026"
+$env:JENKINS_ADMIN_USER = "0900216641"
+$env:JENKINS_ADMIN_PASSWORD = "tu-clave-de-jenkins"
+$env:SLACK_TOKEN = "xoxb-..."
+$env:SLACK_WORKSPACE = "tu-espacio"
+$env:NGROK_AUTHTOKEN = "tu-token-de-ngrok"
+.\arrancar.ps1
+```
+
+El script cambia la contraseña inicial de SonarQube, genera el token de análisis, abre el túnel de ngrok, le pasa todo a Jenkins por variables de entorno y al final te imprime la URL del webhook. Ningún token queda escrito en archivos. Usar tu carné como usuario de Jenkins hace que aparezca en tus capturas, como pide la entrega. Si PowerShell bloquea el script, ejecuta antes `Set-ExecutionPolicy -Scope Process Bypass`.
+
+Las secciones siguientes explican a mano lo mismo que hace el script, para que entiendas cada pieza y puedas responder si te preguntan.
+
 ## 1. Qué hay en el paquete
 
 `docker-compose.yml` define tres contenedores en una misma red llamada `calidad`. Jenkins es el orquestador que ejecuta el job. SonarQube es el servidor que analiza el código y guarda los resultados. PostgreSQL es la base de datos de SonarQube; se usa porque la base embebida que trae SonarQube solo sirve para pruebas y pierde datos al actualizar. ngrok crea un túnel desde internet hasta tu Jenkins, porque GitHub no puede enviar un webhook a `localhost` de tu computadora.
@@ -70,19 +90,19 @@ En Manage Jenkins, Credentials, agrega una credencial de tipo Secret text con el
 
 En Manage Jenkins, System, busca la sección SonarQube servers. Marca la opción de variables de entorno, agrega un servidor con nombre `sonarqube`, URL `http://sonarqube:9000` y la credencial `sonar-token`. Este es el servidor que luego eliges en "SonarQube Installation".
 
-En Manage Jenkins, Tools, registra dos herramientas. En Maven installations crea una llamada `mavenjenkins` con instalación automática desde Apache; uso ese nombre porque es el que ya usan tus Jenkinsfile y tus scripts DSL. En SonarQube Scanner installations crea una llamada `sonar-scanner`, también con instalación automática. Jenkins las descarga la primera vez que el job las necesite.
+En Manage Jenkins, Tools, registra dos herramientas. En Maven installations crea una llamada `maven2026A` con instalación automática desde Apache; el laboratorio pide un nombre con el año y una letra. En SonarQube Scanner installations crea una llamada `sonar-scanner`, también con instalación automática. Jenkins las descarga la primera vez que el job las necesite.
 
 ## 6. Crear el job paso a paso
 
-Crea un New Item de tipo Freestyle project, por ejemplo `calidad-simple-java-maven-app`.
+Crea un New Item de tipo Freestyle project llamado `0900216641_JavaMaven1A`, que es el formato `<carné>_JavaMaven1A` del laboratorio. En General escribe la descripción `Proyecto Java con Maven para Integración Continua` y en JDK elige `jdk21`.
 
-En Source Code Management elige Git, con URL `https://github.com/AlfonsoDbn-314/simple-java-maven-app.git`. En la rama escribe `*/calidad-sonarqube` mientras los cambios no estén en master, y `*/master` cuando los fusiones.
+En Source Code Management elige Git, con URL `https://github.com/AlfonsoDbn-314/simple-java-maven-app.git`. En la rama escribe `*/master`, que es la rama principal de tu fork. Por eso necesitas fusionar el PR antes de construir.
 
 En Build Triggers marca GitHub hook trigger for GITScm polling. Con eso el job deja de depender de que pulses Build Now y se ejecuta solo cuando GitHub avisa que hubo un push.
 
 En Build Steps agrega tres pasos en este orden. El orden importa porque SonarQube analiza el bytecode y necesita que las clases ya estén compiladas.
 
-El primero es Invoke top-level Maven targets con la versión `mavenjenkins` y estas metas:
+El primero es Invoke top-level Maven targets con la versión `maven2026A` y estas metas:
 
 ```
 -B clean package -DskipTests
@@ -101,8 +121,8 @@ El segundo es otro Invoke top-level Maven targets con la misma versión y la met
 El tercero es Execute SonarQube Scanner. En SonarQube Installation elige `sonarqube`, el JDK déjalo heredado del job, en SonarQube Scanner elige `sonar-scanner`, y en Analysis properties pega:
 
 ```
-sonar.projectKey=simple-java-maven-app
-sonar.projectName=simple-java-maven-app
+sonar.projectKey=0900216641_JavaMaven1A
+sonar.projectName=0900216641_JavaMaven1A
 sonar.sources=src/main/java
 sonar.java.binaries=target/classes
 sonar.tests=src/test/java
@@ -123,7 +143,7 @@ target/surefire-reports/*.xml
 
 `surefire-reports` es la carpeta del plugin de Maven que corre las pruebas, y cada clase de prueba deja ahí un XML. Deja el resto de opciones por defecto, con Health report amplification factor en 1.0.
 
-Agrega Slack Notifications y marca Notify Build Start, Notify Success, Notify Every Failure y Notify Back To Normal. Así te enteras cuando empieza, cuando sale bien, cada vez que falla y cuando vuelve a funcionar tras una falla.
+Agrega Slack Notifications y marca exactamente Notify Build Start, Notify Success, Notify Every Failure y Notify Back To Normal, dejando sin marcar Aborted, Not Built, Unstable y Regression. Así te enteras cuando empieza, cuando sale bien, cada vez que falla y cuando vuelve a funcionar tras una falla.
 
 ## 8. Conectar Slack
 
