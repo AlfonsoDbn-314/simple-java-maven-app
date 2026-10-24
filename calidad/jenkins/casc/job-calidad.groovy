@@ -1,5 +1,9 @@
 // Job freestyle de la guía, creado con Job DSL. Mismo orden de pasos que harías a mano.
 // El nombre sigue el formato del laboratorio: <carné>_JavaMaven1A.
+// Slack solo se agrega cuando hay token; sin él, el aviso de inicio abortaría el build antes de Maven.
+def slackToken = System.getenv('SLACK_TOKEN') ?: ''
+def slackListo = slackToken && slackToken != 'sin-token'
+
 job(System.getenv('JOB_NAME_LAB') ?: '0900216641_JavaMaven1A') {
     description('Proyecto Java con Maven para Integración Continua')
     jdk('jdk21')
@@ -40,18 +44,20 @@ sonar.sourceEncoding=UTF-8''')
         archiveJunit('target/surefire-reports/*.xml') {
             healthScaleFactor(1.0)
         }
-        slackNotifier {
-            startNotification(true)
-            notifySuccess(true)
-            notifyEveryFailure(true)
-            notifyBackToNormal(true)
-            notifyAborted(false)
-            notifyNotBuilt(false)
-            notifyUnstable(false)
-            notifyRepeatedFailure(false)
-            includeTestSummary(false)
-            includeCustomMessage(false)
-            commitInfoChoice('AUTHORS_AND_TITLES')
+        if (slackListo) {
+            slackNotifier {
+                startNotification(true)
+                notifySuccess(true)
+                notifyEveryFailure(true)
+                notifyBackToNormal(true)
+                notifyAborted(false)
+                notifyNotBuilt(false)
+                notifyUnstable(false)
+                notifyRepeatedFailure(false)
+                includeTestSummary(false)
+                includeCustomMessage(false)
+                commitInfoChoice('AUTHORS_AND_TITLES')
+            }
         }
     }
 }
